@@ -2,9 +2,8 @@
 
 import { SelectInput } from '@/components/SelectInput'
 import { TextInput } from '@/components/TextInput'
-import { useEffect, useState } from 'react'
-
-type Comparison = '<=' | '=' | '>='
+import Link from 'next/link'
+import { useState } from 'react'
 
 export default function ObjectsPage() {
   const [height, setHeight] = useState('')
@@ -88,7 +87,16 @@ export default function ObjectsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center py-10">
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center p-10">
+      <Link
+        href="/"
+        className="w-11 h-11 bg-gray-600 text-white font-medium p-2 rounded-md shadow hover:bg-gray-500 transition duration-300 mb-5 mr-auto flex items-center"
+      >
+        <svg className="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+          <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 5H1m0 0l4 4m-4-4l4-4"/>
+        </svg>
+      </Link>
+      
       <h1 className="text-3xl font-bold mb-6 text-gray-800">Fit Objects</h1>
 
       <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-md">
