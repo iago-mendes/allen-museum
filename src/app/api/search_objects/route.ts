@@ -72,10 +72,14 @@ export async function GET(request: Request) {
       `
     }
 
+    preparedStatement += `
+      WHERE 1=1
+    `
+
     const title = queryParams.get('title')
     if (title) {
       preparedStatement += `
-        WHERE title LIKE ?
+        AND title LIKE ?
       `
       insertValues.push(`%${title}%`)
     }
@@ -83,9 +87,25 @@ export async function GET(request: Request) {
     const dated = queryParams.get('dated')
     if (dated) {
       preparedStatement += `
-        WHERE dated LIKE ?
+        AND dated LIKE ?
       `
       insertValues.push(`%${dated}%`)
+    }
+
+    const acquisitionId = queryParams.get('acquisitionId')
+    if (acquisitionId) {
+      preparedStatement += `
+        AND acquisition_id = ?
+      `
+      insertValues.push(acquisitionId)
+    }
+
+    const classificationId = queryParams.get('classificationId')
+    if (classificationId) {
+      preparedStatement += `
+        AND classification_id = ?
+      `
+      insertValues.push(classificationId)
     }
 
     preparedStatement += `;`

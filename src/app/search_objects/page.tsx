@@ -1,20 +1,40 @@
 'use client'
 
-import { TextInput } from '@/components/TextInput';
-import { useState } from 'react'
+import { SelectInput } from '@/components/SelectInput'
+import { TextInput } from '@/components/TextInput'
+import { useEffect, useState } from 'react'
 
 export default function ObjectsPage() {
-  const [title, setTitle] = useState('');
-  const [artist, setArtist] = useState('');
-  const [dated, setDated] = useState('');
-  const [period, setPeriod] = useState('');
-  const [culture, setCulture] = useState('');
+  const [title, setTitle] = useState('')
+  const [artist, setArtist] = useState('')
+  const [dated, setDated] = useState('')
+  const [period, setPeriod] = useState('')
+  const [culture, setCulture] = useState('')
+  const [acquisitionId, setAcquisitionId] = useState<number>(-1)
+  const [classificationId, setClassificationId] = useState<number>(-1)
 
-  const [results, setResults] = useState<any[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [acquisitions, setAcquisitions] = useState<any[]>([])
+  const [classifications, setClassifications] = useState<any[]>([])
+
+  const [results, setResults] = useState<any[]>([])
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    getSelectOptions()
+  }, [])
+
+  const getSelectOptions = async () => {
+    const acquisitionsResponse = await fetch('/api/acquisitions')
+    const newAcquisitions = await acquisitionsResponse.json()
+    setAcquisitions(newAcquisitions)
+
+    const classificationsResponse = await fetch('/api/classifications')
+    const newClassifications = await classificationsResponse.json()
+    setClassifications(newClassifications)
+  }
 
   const handleSearch = async () => {
-    setError(null);
+    setError(null)
 
     const queries = []
     if (title.trim()) {
@@ -32,32 +52,51 @@ export default function ObjectsPage() {
     if (culture.trim()) {
       queries.push(`culture=${encodeURIComponent(culture.trim())}`)
     }
+    if (acquisitionId >= 0) {
+      queries.push(`acquisitionId=${acquisitionId}`)
+    }
+    if (classificationId >= 0) {
+      queries.push(`classificationId=${classificationId}`)
+    }
 
     if (queries.length == 0) {
-      setError('Please enter something to search for.');
-      return;
+      setError('Please enter something to search for.')
+      return
     }
 
     try {
-      const response = await fetch(`/api/search_objects?${queries.join('&')}`);
+      const response = await fetch(`/api/search_objects?${queries.join('&')}`)
 
       if (!response.ok) {
-        const { error } = await response.json();
-        setError(error || 'Failed to fetch objects.');
-        return;
+        const { error } = await response.json()
+        setError(error || 'Failed to fetch objects.')
+        return
       }
 
-      const data = await response.json();
-      setResults(data);
+      const data = await response.json()
+      setResults(data)
     } catch (err) {
-      console.error(err);
-      setError('An unexpected error occurred.');
+      console.error(err)
+      setError('An unexpected error occurred.')
     }
-  };
+  }
+
+  const handleClear = async () => {
+    setResults([])
+    setError(null)
+
+    setTitle('')
+    setArtist('')
+    setDated('')
+    setPeriod('')
+    setCulture('')
+    setAcquisitionId(-1)
+    setClassificationId(-1)
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center py-10">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800">Search Objects by Culture</h1>
+      <h1 className="text-3xl font-bold mb-6 text-gray-800">Search Objects</h1>
 
       <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-md">
         <TextInput
@@ -90,12 +129,31 @@ export default function ObjectsPage() {
           value={culture}
           setValue={setCulture}
         />
+        <SelectInput
+          label="Acquisition Method"
+          options={acquisitions}
+          value={acquisitionId}
+          setValue={setAcquisitionId}
+        />
+        <SelectInput
+          label="Classification"
+          options={classifications}
+          value={classificationId}
+          setValue={setClassificationId}
+        />
 
         <button
           onClick={handleSearch}
           className="w-full bg-indigo-600 text-white font-medium py-2 px-4 rounded-md shadow hover:bg-indigo-500 transition duration-300"
         >
           Search
+        </button>
+
+        <button
+          onClick={handleClear}
+          className="w-full bg-gray-600 text-white font-medium py-2 px-4 rounded-md shadow hover:bg-gray-500 transition duration-300 mt-2"
+        >
+          Clear
         </button>
       </div>
 
@@ -136,5 +194,5 @@ export default function ObjectsPage() {
         )}
       </div>
     </div>
-  );
+  )
 }
