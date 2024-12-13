@@ -133,13 +133,15 @@ export default function ObjectsPage() {
           label="Acquisition Method"
           options={acquisitions}
           value={acquisitionId}
-          setValue={setAcquisitionId}
+          setValue={v => setAcquisitionId(Number(v))}
+          noFilterOption={true}
         />
         <SelectInput
           label="Classification"
           options={classifications}
           value={classificationId}
-          setValue={setClassificationId}
+          setValue={v => setClassificationId(Number(v))}
+          noFilterOption={true}
         />
 
         <button
